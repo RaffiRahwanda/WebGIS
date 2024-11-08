@@ -1,0 +1,129 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Models\HasilLaboratorium;
+use ArielMejiaDev\LarapexCharts\LarapexChart;
+use Carbon\Carbon;
+use DB;
+class ChartController extends Controller
+{
+    public function index()
+    {
+        // Mengambil data dari database
+        $now = Carbon::now();
+        $charts = [];
+        for ($year = 2019; $year <= 2024; $year++) {
+            $charts[$year] = $this->getChartData($year);
+        }
+        $tahun = DB::table('hasil_lab')->select('tahun')->groupBy('tahun')->get();
+
+        return view('charts', compact('charts'));
+    }
+
+    private function getChartData($year)
+    {
+        $sales = HasilLaboratorium::where('tahun', $year)->orderBy('bulan')->get();
+        // $tss = $sales->pluck('tss')->toArray();
+        // $do = $sales->pluck('do')->toArray();
+        // $bod = $sales->pluck('bod')->toArray();
+        // $cod = $sales->pluck('cod')->toArray();
+        // $fosfat = $sales->pluck('fosfat')->toArray();
+        // $fecal_coli = $sales->pluck('fecal_coli')->toArray();
+        // $total_coliform = $sales->pluck('total_coliform')->toArray();
+        // // $datas = $sales->pluck('do')->toArray();
+        // $labels = $sales->pluck('space_id')->toArray();
+        $tss = [];
+        $do = [];
+        $bod = [];
+        $cod = [];
+        $fosfat = [];
+        $fecal_coli = [];
+        $total_coliform = [];
+        $labels = [];
+         foreach ($sales as $sale) {
+            $tss[] = (float) $sale->tss;
+            $do[] = (float) $sale->do;  
+            $bod[] = (float) $sale->bod;
+            $cod[] = (float) $sale->cod; 
+            $fosfat[] = (float) $sale->fosfat; 
+            $fecal_coli[] = $sale->fecal_coli; 
+            $total_coliform[] = $sale->total_coliform; 
+
+            $labels[] = $sale->space_id;
+        }
+
+        // return (new LarapexChart)
+        //     ->setTitle("Sales in $year")
+        //     ->setDataset($data)
+        //     ->setLabels($labels);
+        //  $monthNames = [
+        //     1 => 'Januari', 2 => 'Februari', 3 => 'Maret',
+        //     4 => 'April', 5 => 'Mei', 6 => 'Juni',
+        //     7 => 'Juli', 8 => 'Agustus', 9 => 'September',
+        //     10 => 'Oktober', 11 => 'November', 12 => 'December'
+        // ];
+        // $labels = array_map(function($month) use ($monthNames) {
+        //     return $monthNames[$month];
+        // }, $labels);
+         return [
+            'year' => $year,
+            'tss'=>$tss,
+            'do'=>$do,
+            'bod'=>$bod,
+            'cod' => $cod,
+            'fosfat' => $fosfat,
+            'fecal_coli' => $fecal_coli,
+            'total_coliform' => $total_coliform,
+
+            'labels' => $labels,
+            
+        ];
+
+        //   $data = [];
+        // $labels = [];
+
+        // Nama bulan
+        // $sales = HasilLaboratorium::where('tahun', $year)->orderBy('bulan')->get();
+        // $monthNames = [
+        //  'Januari' => 'Januari', 'Februari' => 'Februari', 'Maret' => 'Maret',
+        //     4 => 'April', 'Mei' => 'Mei', 'Juni' => 'Juni',
+        //     7 => 'Juli', 8 => 'Agustus', 9 => 'September',
+        //     10 => 'Oktober', 11 => 'November', 12 => 'December'
+        // ];
+        // //   $data = array_fill(1, 12, 0);
+        //       $data = [];
+        // $labels = [];
+        // foreach ($sales as $sale) {
+        //     $data[] = $sale->cod;
+        //     $labels[] = $monthNames[$sale->bulan];
+        }
+        // $labels = $monthNames;
+
+        // // Isi data berdasarkan hasil query
+        // foreach ($sales as $sale) {
+        //     $data[$sale->bulan] = $sale->cod;
+        // }
+
+        // Pastikan data dan label selaras
+        // return [
+        //     'year' => $year,
+        //     'data' => array_values($data),
+        //     'labels' => array_values($labels)
+        // ];  
+
+        // Loop melalui data penjualan dan siapkan array data dan label
+        // foreach ($sales as $sale) {
+        //     $data[] = $sale->cod;
+        //     $labels[] = $monthNames[$sale->bulan];
+        // }
+
+        // return [
+        //     'year' => $year,
+        //     'data' => $data,
+        //     'labels' => $labels
+        // ];
+        }
+    
+
